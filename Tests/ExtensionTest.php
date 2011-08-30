@@ -36,8 +36,9 @@ class ExtensionTest extends \PHPUnit_Framework_TestCase
         $app = new Application();
 
         $app->register(new RestExtension(), array(
-            'rest.fos.class_path'           => __DIR__.'/../vendor',
-            'rest.serializer.class_path'    => __DIR__.'/../vendor',
+            'rest.fos.class_path'                  => __DIR__.'/../vendor',
+            'rest.serializer.class_path'           => __DIR__.'/../vendor',
+            'rest.dependency_injection.class_path' => __DIR__.'/../vendor',
         ));
 
         $this->assertInstanceOf('Symfony\Component\Serializer\Serializer', $app['rest.serializer']);

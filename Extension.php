@@ -13,6 +13,7 @@ namespace Flintstones\Rest;
 
 use FOS\RestBundle\EventListener\BodyListener;
 use FOS\RestBundle\EventListener\FormatListener;
+use FOS\RestBundle\Request\ContentNegotiator;
 
 use Silex\Application;
 use Silex\ExtensionInterface;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpKernel\KernelEvents as HttpKernelEvents;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\DependencyInjection\Container;
 
 class Extension implements ExtensionInterface
 {
@@ -47,11 +49,21 @@ class Extension implements ExtensionInterface
             $app['autoloader']->registerNamespace('Symfony\Component\Serializer', $app['rest.serializer.class_path']);
         }
 
-        $listener = new BodyListener($app['rest.serializer']);
+        if (isset($app['rest.dependency_injection.class_path'])) {
+            $app['autoloader']->registerNamespace('Symfony\Component\DependencyInjection', $app['rest.dependency_injection.class_path']);
+        }
+
+        $container = new Container;
+        $container->set('rest.serializer', $app['rest.serializer']);
+
+        $listener = new BodyListener(array('json' => 'rest.serializer', 'xml' => 'rest.serializer'));
+        $listener->setContainer($container);
+
         $app['dispatcher']->addListener(HttpKernelEvents::REQUEST, array($listener, 'onKernelRequest'));
 
         $app['dispatcher']->addListener(HttpKernelEvents::REQUEST, function () use ($app) {
-            $listener = new FormatListener('html', $app['rest.priorities']);
+            $cn       = new ContentNegotiator;
+            $listener = new FormatListener($cn, 'html', $app['rest.priorities']);
             $app['dispatcher']->addListener(HttpKernelEvents::CONTROLLER, array($listener, 'onKernelController'), 10);
         });
     }

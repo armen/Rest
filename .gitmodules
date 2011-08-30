@@ -7,3 +7,6 @@
 [submodule "vendor/silex"]
 	path = vendor/silex
 	url = https://github.com/fabpot/Silex
+[submodule "vendor/Symfony/Component/DependencyInjection"]
+	path = vendor/Symfony/Component/DependencyInjection
+	url = https://github.com/symfony/DependencyInjection
