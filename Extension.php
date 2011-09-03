@@ -13,7 +13,7 @@ namespace Flintstones\Rest;
 
 use FOS\RestBundle\EventListener\BodyListener;
 use FOS\RestBundle\EventListener\FormatListener;
-use FOS\RestBundle\Request\ContentNegotiator;
+use FOS\RestBundle\Util\FormatNegotiator;
 
 use Silex\Application;
 use Silex\ExtensionInterface;
@@ -62,8 +62,8 @@ class Extension implements ExtensionInterface
         $app['dispatcher']->addListener(HttpKernelEvents::REQUEST, array($listener, 'onKernelRequest'));
 
         $app['dispatcher']->addListener(HttpKernelEvents::REQUEST, function () use ($app) {
-            $cn       = new ContentNegotiator;
-            $listener = new FormatListener($cn, 'html', $app['rest.priorities']);
+            $fn       = new FormatNegotiator;
+            $listener = new FormatListener($fn, 'html', $app['rest.priorities']);
             $app['dispatcher']->addListener(HttpKernelEvents::CONTROLLER, array($listener, 'onKernelController'), 10);
         });
     }
